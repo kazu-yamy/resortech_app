@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -15,7 +16,8 @@ class CameraScreen extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final cameraControllerFuture = ref.watch(controllerProvider);
-    final response = ref.watch(responseProvider);
+    final percent = ref.watch(percentProvider);
+    final result = ref.watch(resultProvider);
 
     // コントローラーの状態を管理するためのuseStateフック
     final cameraController = useState<CameraController?>(null);
@@ -32,6 +34,7 @@ class CameraScreen extends HookConsumerWidget {
           // コントローラーがキャンセルされていなければ状態を更新
           if (!isCancelled) {
             await controller.initialize();
+            await controller.setFlashMode(FlashMode.off);
             cameraController.value = controller;
             timer = Timer.periodic(const Duration(seconds: 1), (timer) async {
               if (!isCancelled) {
@@ -39,7 +42,9 @@ class CameraScreen extends HookConsumerWidget {
                   XFile image = await controller.takePicture();
                   var response =
                       await ResortechRepository.postImage(image.path);
-                  ref.read(responseProvider.notifier).state = response.body;
+                  Map<String, dynamic> convert =  jsonDecode(response.body);
+                  ref.read(resultProvider.notifier).state = convert["result"];
+                  ref.read(percentProvider.notifier).state = convert["percent"];
                 } on CameraException catch (e) {
                   debugPrint(e.toString());
                 }
@@ -72,12 +77,16 @@ class CameraScreen extends HookConsumerWidget {
         if (controller.value.isInitialized)
           AspectRatio(
               aspectRatio: controller.value.aspectRatio,
-              child: Column(
+              child: Row(
                 children: [
-                  CameraPreview(
-                    controller,
-                    child: Text(response),
-                  )
+                  SizedBox(width: MediaQuery.of(context).size.width * 0.7,child: CameraPreview(
+                    controller
+                  ),),
+                  SizedBox(child: Column(children:[
+                    Text(result, style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),),
+                    const SizedBox(height: 20),
+                    Text(percent)
+                    ]))
                 ],
               )),
       ],
