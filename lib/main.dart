@@ -6,6 +6,7 @@ import './view/cam_screen.dart';
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
   SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
+  SystemChrome.setPreferredOrientations([DeviceOrientation.landscapeLeft]);
   runApp(const ProviderScope(child: MyApp()));
 }
 
