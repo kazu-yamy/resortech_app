@@ -40,7 +40,9 @@ class CameraScreen extends HookConsumerWidget {
                   var response =
                       await ResortechRepository.postImage(image.path);
                   ref.read(responseProvider.notifier).state = response.body;
-                } on CameraException {}
+                } on CameraException catch (e) {
+                  debugPrint(e.toString());
+                }
               }
             });
           }
