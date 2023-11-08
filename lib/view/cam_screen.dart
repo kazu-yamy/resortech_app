@@ -16,6 +16,7 @@ class CameraScreen extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final cameraControllerFuture = ref.watch(controllerProvider);
+    final response = ref.watch(responseProvider);
 
     // コントローラーの状態を管理するためのuseStateフック
     final cameraController = useState<CameraController?>(null);
@@ -33,14 +34,15 @@ class CameraScreen extends HookConsumerWidget {
           if (!isCancelled) {
             await controller.initialize();
             cameraController.value = controller;
-            timer =
-                Timer.periodic(const Duration(microseconds: 1), (timer) async {
-              controller.value.isInitialized;
-              ref.read(imageProvider.notifier).state =
-                  await controller.takePicture();
-              var response = await ResortechRepository.postImage(
-                  ref.watch(imageProvider).path);
-              ref.read(responseProvider.notifier).state = response.body;
+            timer = Timer.periodic(const Duration(seconds: 1), (timer) async {
+              if (!isCancelled) {
+                try {
+                  XFile image = await controller.takePicture();
+                  var response =
+                      await ResortechRepository.postImage(image.path);
+                  ref.read(responseProvider.notifier).state = response.body;
+                } on CameraException {}
+              }
             });
           }
         } catch (e) {
@@ -68,20 +70,15 @@ class CameraScreen extends HookConsumerWidget {
       children: <Widget>[
         if (controller.value.isInitialized)
           AspectRatio(
-            aspectRatio: controller.value.aspectRatio,
-            child: Column(
-              children: [
-                SizedBox(
-                  height: MediaQuery.of(context).size.height * 0.8,
-                  child: CameraPreview(controller),
-                ),
-                SizedBox(
-                  height: MediaQuery.of(context).size.height * 0.2,
-                  child: Text(ref.watch(responseProvider)),
-                ),
-              ],
-            ),
-          ),
+              aspectRatio: controller.value.aspectRatio,
+              child: Column(
+                children: [
+                  CameraPreview(
+                    controller,
+                    child: Text(response),
+                  )
+                ],
+              )),
       ],
     );
   }
