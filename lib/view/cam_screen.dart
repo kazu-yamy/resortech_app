@@ -1,10 +1,14 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:camera/camera.dart';
+import 'package:resortech_app/infrastructure/resortech_repository.dart';
 import 'package:resortech_app/provider/controller.dart';
 import 'package:resortech_app/provider/image.dart';
 import 'package:resortech_app/provider/initialized.dart';
+import 'package:resortech_app/provider/response.dart';
 
 class CameraScreen extends HookConsumerWidget {
   const CameraScreen({super.key});
@@ -18,6 +22,7 @@ class CameraScreen extends HookConsumerWidget {
 
     useEffect(() {
       bool isCancelled = false;
+      Timer timer = Timer.periodic(const Duration(microseconds: 1), (timer) {});
 
       // 非同期処理を実行
       Future<void> initializeCamera() async {
@@ -28,14 +33,18 @@ class CameraScreen extends HookConsumerWidget {
           if (!isCancelled) {
             await controller.initialize();
             cameraController.value = controller;
-            controller.startImageStream((image) {
-              ref.read(imageProvider.notifier).state = image;
+            timer =
+                Timer.periodic(const Duration(microseconds: 1), (timer) async {
+              controller.value.isInitialized;
+              ref.read(imageProvider.notifier).state =
+                  await controller.takePicture();
+              var response = await ResortechRepository.postImage(
+                  ref.watch(imageProvider).path);
+              ref.read(responseProvider.notifier).state = response.body;
             });
           }
         } catch (e) {
-          if (!isCancelled) {
-            print("asdlkjfalksdjfa;lkjsdf;lkajsdflk");
-          }
+          if (!isCancelled) {}
         }
       }
 
@@ -46,10 +55,11 @@ class CameraScreen extends HookConsumerWidget {
       return () {
         isCancelled = true;
         cameraController.value?.dispose();
+        timer.cancel();
       };
     }, const []);
 
-    if (!ref.watch(initializedProvider) || cameraController.value == null) {
+    if (ref.watch(initializedProvider) || cameraController.value == null) {
       return const CircularProgressIndicator();
     }
 
@@ -59,7 +69,18 @@ class CameraScreen extends HookConsumerWidget {
         if (controller.value.isInitialized)
           AspectRatio(
             aspectRatio: controller.value.aspectRatio,
-            child: const Text("sdafasdf"),
+            child: Column(
+              children: [
+                SizedBox(
+                  height: MediaQuery.of(context).size.height * 0.8,
+                  child: CameraPreview(controller),
+                ),
+                SizedBox(
+                  height: MediaQuery.of(context).size.height * 0.2,
+                  child: Text(ref.watch(responseProvider)),
+                ),
+              ],
+            ),
           ),
       ],
     );
