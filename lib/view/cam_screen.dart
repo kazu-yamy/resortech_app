@@ -6,7 +6,6 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:camera/camera.dart';
 import 'package:resortech_app/infrastructure/resortech_repository.dart';
 import 'package:resortech_app/provider/controller.dart';
-import 'package:resortech_app/provider/image.dart';
 import 'package:resortech_app/provider/initialized.dart';
 import 'package:resortech_app/provider/response.dart';
 
