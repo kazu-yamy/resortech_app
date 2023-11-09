@@ -42,7 +42,7 @@ class CameraScreen extends HookConsumerWidget {
                   XFile image = await controller.takePicture();
                   var response =
                       await ResortechRepository.postImage(image.path);
-                  Map<String, dynamic> convert =  jsonDecode(response.body);
+                  Map<String, dynamic> convert = jsonDecode(response.body);
                   ref.read(resultProvider.notifier).state = convert["result"];
                   ref.read(percentProvider.notifier).state = convert["percent"];
                 } on CameraException catch (e) {
@@ -75,20 +75,35 @@ class CameraScreen extends HookConsumerWidget {
     return Column(
       children: <Widget>[
         if (controller.value.isInitialized)
-          AspectRatio(
-              aspectRatio: controller.value.aspectRatio,
-              child: Row(
-                children: [
-                  SizedBox(width: MediaQuery.of(context).size.width * 0.7,child: CameraPreview(
-                    controller
-                  ),),
-                  SizedBox(child: Column(children:[
-                    Text(result, style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),),
-                    const SizedBox(height: 20),
-                    Text(percent)
-                    ]))
-                ],
-              )),
+          const SizedBox(
+            height: 40,
+          ),
+        Center(
+            child: Row(
+          children: [
+            Center(
+              child: SizedBox(
+                width: MediaQuery.of(context).size.width * 0.7,
+                child: CameraPreview(controller),
+              ),
+            ),
+            const SizedBox(
+              width: 30,
+            ),
+            SizedBox(
+                child: Column(children: [
+              Text(
+                result,
+                style:
+                    const TextStyle(fontSize: 50, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 20),
+              Text(percent,
+                  style: const TextStyle(
+                      fontSize: 50, fontWeight: FontWeight.bold))
+            ]))
+          ],
+        )),
       ],
     );
   }

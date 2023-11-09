@@ -5,5 +5,5 @@ import 'package:resortech_app/provider/camera.dart';
 
 final controllerProvider = StateProvider<Future<CameraController>>((ref) async {
   List<CameraDescription> cameras = await ref.watch(cameraProvider);
-  return CameraController(cameras[0], ResolutionPreset.high);
+  return CameraController(cameras[1], ResolutionPreset.high);
 });
