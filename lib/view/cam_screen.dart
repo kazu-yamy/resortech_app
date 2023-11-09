@@ -75,35 +75,21 @@ class CameraScreen extends HookConsumerWidget {
     return Column(
       children: <Widget>[
         if (controller.value.isInitialized)
-          const SizedBox(
-            height: 40,
-          ),
-        Center(
-            child: Row(
-          children: [
-            Center(
-              child: SizedBox(
-                width: MediaQuery.of(context).size.width * 0.7,
-                child: CameraPreview(controller),
+          CameraPreview(
+            controller,
+            child: Center(
+              child: Row(
+                children: <Widget>[
+                  SizedBox(
+                    child: Text(result),
+                  ),
+                  SizedBox(
+                    child: Text("$percent%"),
+                  )
+                ],
               ),
             ),
-            const SizedBox(
-              width: 30,
-            ),
-            SizedBox(
-                child: Column(children: [
-              Text(
-                result,
-                style:
-                    const TextStyle(fontSize: 50, fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 20),
-              Text(percent,
-                  style: const TextStyle(
-                      fontSize: 50, fontWeight: FontWeight.bold))
-            ]))
-          ],
-        )),
+          )
       ],
     );
   }

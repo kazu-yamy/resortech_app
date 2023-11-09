@@ -1,7 +1,7 @@
 import 'package:http/http.dart' as http;
 
 class ResortechRepository {
-  static Future<http.Response> postImage(String imagePath) async {
+  static postImage(String imagePath) async {
     final url = Uri.parse('http://192.168.10.2:8000/api/v1/predict');
     final request = http.MultipartRequest('POST', url);
 
@@ -9,7 +9,11 @@ class ResortechRepository {
 
     request.files.add(file);
 
-    final response = await request.send();
-    return await http.Response.fromStream(response);
+    try {
+      final response = await request.send();
+      return await http.Response.fromStream(response);
+    } catch (e) {
+      return "error to get response";
+    }
   }
 }
