@@ -25,11 +25,8 @@ class MainPage extends HookConsumerWidget {
   const MainPage({super.key});
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Camera App'),
-      ),
-      body: const CameraScreen(),
+    return const Scaffold(
+      body: CameraScreen(),
     );
   }
 }

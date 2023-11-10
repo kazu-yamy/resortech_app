@@ -77,19 +77,29 @@ class CameraScreen extends HookConsumerWidget {
         if (controller.value.isInitialized)
           CameraPreview(
             controller,
-            child: Center(
-              child: Row(
-                children: <Widget>[
-                  SizedBox(
-                    child: Text(result),
+            child: Row(
+              children: <Widget>[
+                Container(
+                  height: MediaQuery.of(context).size.height * 0.15,
+                  width: MediaQuery.of(context).size.width * 0.4,
+                  decoration: BoxDecoration(
+                    color: Colors.greenAccent,
+                    borderRadius: BorderRadius.circular(10.0),
                   ),
-                  SizedBox(
-                    child: Text("$percent%"),
-                  )
-                ],
-              ),
+                  child: Text(result),
+                ),
+                Container(
+                  height: MediaQuery.of(context).size.height * 0.15,
+                  width: MediaQuery.of(context).size.width * 0.4,
+                  decoration: BoxDecoration(
+                    color: Colors.redAccent,
+                    borderRadius: BorderRadius.circular(10.0),
+                  ),
+                  child: Text("$percent%"),
+                ),
+              ],
             ),
-          )
+          ),
       ],
     );
   }
