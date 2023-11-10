@@ -43,8 +43,10 @@ class CameraScreen extends HookConsumerWidget {
                   var response =
                       await ResortechRepository.postImage(image.path);
                   Map<String, dynamic> convert = jsonDecode(response.body);
-                  ref.read(resultProvider.notifier).state = convert["result"];
-                  ref.read(percentProvider.notifier).state = convert["percent"];
+                  ref.read(resultProvider.notifier).state =
+                      convert["result"][0];
+                  ref.read(percentProvider.notifier).state =
+                      convert["result"][1].toString();
                 } on CameraException catch (e) {
                   debugPrint(e.toString());
                 }
@@ -75,31 +77,33 @@ class CameraScreen extends HookConsumerWidget {
     return Column(
       children: <Widget>[
         if (controller.value.isInitialized)
-          CameraPreview(
-            controller,
-            child: Row(
-              children: <Widget>[
-                Container(
-                  height: MediaQuery.of(context).size.height * 0.15,
-                  width: MediaQuery.of(context).size.width * 0.4,
-                  decoration: BoxDecoration(
-                    color: Colors.greenAccent,
-                    borderRadius: BorderRadius.circular(10.0),
+          SizedBox(
+            height: MediaQuery.of(context).size.height,
+            width: MediaQuery.of(context).size.width,
+            child: CameraPreview(
+              controller,
+              child: Row(
+                children: <Widget>[
+                  Text(
+                    result,
+                    style: const TextStyle(
+                      fontSize: 50,
+                      fontWeight: FontWeight.w900,
+                      backgroundColor: Colors.greenAccent,
+                    ),
                   ),
-                  child: Text(result),
-                ),
-                Container(
-                  height: MediaQuery.of(context).size.height * 0.15,
-                  width: MediaQuery.of(context).size.width * 0.4,
-                  decoration: BoxDecoration(
-                    color: Colors.redAccent,
-                    borderRadius: BorderRadius.circular(10.0),
+                  Text(
+                    "$percent%",
+                    style: const TextStyle(
+                      fontSize: 50,
+                      fontWeight: FontWeight.w900,
+                      backgroundColor: Colors.redAccent,
+                    ),
                   ),
-                  child: Text("$percent%"),
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
+          )
       ],
     );
   }

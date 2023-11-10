@@ -9,11 +9,7 @@ class ResortechRepository {
 
     request.files.add(file);
 
-    try {
-      final response = await request.send();
-      return await http.Response.fromStream(response);
-    } catch (e) {
-      return "error to get response";
-    }
+    final response = await request.send();
+    return await http.Response.fromStream(response);
   }
 }
